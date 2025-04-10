@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 #
+
+echo "🔊 PAROLE: Automatic Speech Prosody Extraction from Video"
+echo "Copyright (C) 2025 Brian Herreño Jiménez & Cristóbal Pagán Cánovas"
+echo "License: GNU GPL v3 - see LICENSE file or https://www.gnu.org/licenses/gpl-3.0.html"
+echo ""
+echo "This program is free software: you can redistribute it and/or modify"
+echo "it under the terms of the GNU General Public License as published by"
+echo "the Free Software Foundation, either version 3 of the License, or"
+echo "(at your option) any later version."
+echo ""
+
 # Uso: ./parole.sh VIDEO.mp4 OUTPUT_DIR [--parquet]
 #
 # Este script hace secuencialmente:
