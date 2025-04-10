@@ -1,9 +1,6 @@
 [➡️ English Version](#english)
 
-# 📌 PAROLE: Extracción automática de prosodia del habla
-
-[![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)](https://github.com/daedalusLAB/parole/actions/workflows/main.yml)
-
+# 📌 PAROLE: Extracción automática de prosodia del habla ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)
 
 ## 🛠️ Descripción
 
@@ -106,7 +103,7 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 
 [➡️ Versión en Español](#parole-extracción-automática-de-prosodia-del-habla)
 
-# 📌 PAROLE: Automatic Speech Prosody Extraction
+# 📌 PAROLE: Automatic Speech Prosody Extraction ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)
 
 ## 🛠️ Description
 
