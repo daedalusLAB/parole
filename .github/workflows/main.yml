@@ -1,5 +1,14 @@
 name: Test PAROLE pipeline
 
+  run: |
+    mkdir -p env/praat
+    curl -L https://www.fon.hum.uva.nl/praat/praat6427_linux-intel64-barren.tar.gz -o env/praat/praat.tar.gz
+    tar -xzf env/praat/praat.tar.gz -C env/praat
+    rm env/praat/praat.tar.gz
+    chmod +x env/praat/*
+    # Crear symlink a 'praat' para que se detecte como comando
+    sudo ln -s "$PWD/env/praat/praat_barren" /usr/local/bin/praat
+
 on:
   push:
     branches: [ main ]
