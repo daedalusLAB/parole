@@ -1,0 +1,38 @@
+name: Test PAROLE pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-parole:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 🔄 Checkout repository
+      uses: actions/checkout@v3
+
+    - name: 🧰 Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg libasound2-dev libgtk2.0-dev r-base curl
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: 🧪 Run install script
+      run: |
+        bash install_parole.sh <<< $'\n'
+
+    - name: 🧪 Run test video through PAROLE
+      run: |
+        chmod +x scripts/parole.sh
+        ./scripts/parole.sh data/videos/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today.mp4 resultados/ --parquet
+
+    - name: ✅ Check output
+      run: |
+        test -f resultados/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today_prosody.parquet
