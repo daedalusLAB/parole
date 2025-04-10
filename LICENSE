@@ -9,7 +9,6 @@
 
   The GNU General Public License is a free, copyleft license for
 software and other kinds of works.
-
   The licenses for most software and other practical works are designed
 to take away your freedom to share and change the works.  By contrast,
 the GNU General Public License is intended to guarantee your freedom to
@@ -657,7 +656,7 @@ Also add information on how to contact you by electronic and paper mail.
 notice like this when it starts in an interactive mode:
 
     PAROLE: Automatic Speech Prosody Extraction from Video
-    Copyright (C) 2025  Brian Herreño Jiménez
+    Copyright (C) 2025  Brian Herreño Jiménez & Cristóbal Pagán Cánovas
     
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
