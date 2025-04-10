@@ -1,5 +1,11 @@
 #!/usr/bin/env Rscript
 
+# PAROLE: Script para procesado prosódico de voz
+# Copyright (C) 2025  Brian Herreño Jiménez & Cristóbal Pagán Cánovas
+#
+# Distribuido bajo los términos de la GNU General Public License v3 o superior.
+# Ver el archivo LICENSE en el repositorio para más información.
+
 # -------------------------------------------------------------
 # Asegurar que 'arrow' esté instalado, única dependencia externa
 # -------------------------------------------------------------
