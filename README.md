@@ -1,6 +1,7 @@
 [➡️ English Version](#english)
 
-# 📌 PAROLE: Extracción automática de prosodia del habla ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)
+# 📌 PAROLE: Extracción automática de prosodia del habla [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15192144.svg)](https://doi.org/10.5281/zenodo.15192144)
+ ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg) 
 
 ## 🛠️ Descripción
 
@@ -103,7 +104,8 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 
 [➡️ Versión en Español](#parole-extracción-automática-de-prosodia-del-habla)
 
-# 📌 PAROLE: Automatic Speech Prosody Extraction ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)
+# 📌 PAROLE: Automatic Speech Prosody Extraction [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15192144.svg)](https://doi.org/10.5281/zenodo.15192144)
+ ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)
 
 ## 🛠️ Description
 
