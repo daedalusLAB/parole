@@ -2,6 +2,9 @@
 
 # 📌 PAROLE: Extracción automática de prosodia del habla
 
+[![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)](https://github.com/daedalusLAB/parole/actions/workflows/main.yml)
+
+
 ## 🛠️ Descripción
 
 **PAROLE** es un pipeline automatizado para la extracción de información prosódica del habla (pitch, intensidad, formantes, harmonicidad, y detección de actividad vocal mediante VAD) desde vídeos. Utiliza herramientas estándar como Praat, Python, R y Silero-VAD, proporcionando resultados en formatos CSV o Parquet.
@@ -75,9 +78,6 @@ Este repositorio cuenta con un test automático en GitHub Actions que verifica:
 - Instalación del entorno completo (Python, R, Praat)
 - Ejecución del script `parole.sh` sobre un vídeo de prueba
 - Verificación del archivo de salida en `.parquet`
-
-Puedes ver el estado actual del test aquí:  
-![GitHub Actions Status](https://github.com/usuario/repositorio/actions/workflows/main.yml/badge.svg)
 
 Para más detalles, consulta el archivo [`main.yml`](.github/workflows/main.yml).
 
@@ -182,8 +182,6 @@ This repository includes an automated test in GitHub Actions that checks:
 - Execution of the `parole.sh` script on a test video
 - Verification of the `.parquet` output file
 
-You can see the current test status here:  
-![GitHub Actions Status](https://github.com/username/repository/actions/workflows/main.yml/badge.svg)
 
 For more details, see the [`main.yml`](.github/workflows/main.yml) file.
 
