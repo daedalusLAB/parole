@@ -62,10 +62,22 @@ Esto creará los entornos de Python y R necesarios, instalará Praat (versión b
 
 ## 📖 Dependencias clave
 
-- **Praat** (CLI, versión barren incluida)
-- **FFmpeg / FFprobe**
-- **Python**: torch, torchaudio, pandas
-- **R**: arrow, data.table, tidyverse
+Este proyecto requiere las siguientes herramientas y librerías en distintos entornos:
+
+- **Praat** — Interfaz de línea de comandos (CLI), incluye la versión *barren* utilizada para la extracción prosódica  
+- **FFmpeg / FFprobe** — Para la gestión de audio/vídeo y alineación de timestamps
+
+### 🐍 Python
+
+- [`torch`](https://pytorch.org/) — Librería principal de deep learning usada por Silero VAD  
+- [`torchaudio`](https://pytorch.org/audio/stable/) — Utilidades de procesamiento de audio para PyTorch  
+- [`pandas`](https://pandas.pydata.org/) — Manipulación y gestión de datos  
+
+### 📦 R
+
+- [`arrow`](https://cran.r-project.org/package=arrow) — Usado para guardar los datos prosódicos finales en formato `.parquet`  
+
+
 
 ---
 
@@ -163,13 +175,23 @@ This will set up necessary Python and R environments, install Praat (barren vers
 ```
 
 ---
-
 ## 📖 Key Dependencies
 
-- **Praat** (CLI, barren version included)
-- **FFmpeg / FFprobe**
-- **Python**: torch, torchaudio, pandas
-- **R**: arrow, data.table, tidyverse
+This project requires the following tools and libraries across different environments:
+
+- **Praat** — Command-line interface (CLI), includes the *barren* version used for prosodic extraction  
+- **FFmpeg / FFprobe** — For audio/video alignment and timestamp management
+
+### 🐍 Python
+
+- [`torch`](https://pytorch.org/) — Core deep learning library used by Silero VAD  
+- [`torchaudio`](https://pytorch.org/audio/stable/) — Audio processing utilities for PyTorch  
+- [`pandas`](https://pandas.pydata.org/) — Data handling and manipulation  
+
+### 📦 R
+
+- [`arrow`](https://cran.r-project.org/package=arrow) — Used to write the final prosodic data as `.parquet` files  
+
 
 ---
 
