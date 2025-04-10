@@ -18,3 +18,7 @@ __pycache__/
 *.Intensity
 *.PointProcess
 *.Harmonicity
+
+# Ignorar los workflows de GitHub Actions
+.github/workflows/
+

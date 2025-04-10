@@ -68,6 +68,21 @@ Esto creará los entornos de Python y R necesarios, instalará Praat (versión b
 
 ---
 
+## 🔁 GitHub Actions
+
+Este repositorio cuenta con un test automático en GitHub Actions que verifica:
+
+- Instalación del entorno completo (Python, R, Praat)
+- Ejecución del script `parole.sh` sobre un vídeo de prueba
+- Verificación del archivo de salida en `.parquet`
+
+Puedes ver el estado actual del test aquí:  
+![GitHub Actions Status](https://github.com/usuario/repositorio/actions/workflows/main.yml/badge.svg)
+
+Para más detalles, consulta el archivo [`main.yml`](.github/workflows/main.yml).
+
+---
+
 ## 💬 Contactos
 
 - **Soporte técnico:** [[Brian Herreño Jiménez](mailto:brian.herreno@um.es)
@@ -156,6 +171,21 @@ This will set up necessary Python and R environments, install Praat (barren vers
 - **FFmpeg / FFprobe**
 - **Python**: torch, torchaudio, pandas
 - **R**: arrow, data.table, tidyverse
+
+---
+
+## 🔁 GitHub Actions
+
+This repository includes an automated test in GitHub Actions that checks:
+
+- Installation of the full environment (Python, R, Praat)
+- Execution of the `parole.sh` script on a test video
+- Verification of the `.parquet` output file
+
+You can see the current test status here:  
+![GitHub Actions Status](https://github.com/username/repository/actions/workflows/main.yml/badge.svg)
+
+For more details, see the [`main.yml`](.github/workflows/main.yml) file.
 
 ---
 
