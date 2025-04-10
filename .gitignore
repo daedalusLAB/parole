@@ -1,0 +1,20 @@
+# Ignorar entornos y resultados
+env/
+resultados/
+
+# Archivos de R
+.Rhistory
+.RData
+.Rproj.user
+
+# Cachés de Python
+__pycache__/
+*.pyc
+
+# Archivos de audio y salida intermedia de Praat
+*.wav
+*.Pitch
+*.Formant
+*.Intensity
+*.PointProcess
+*.Harmonicity
