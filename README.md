@@ -1,7 +1,20 @@
 [➡️ English Version](#english)
 
-# 📌 PAROLE: Extracción automática de prosodia del habla [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15192144.svg)](https://doi.org/10.5281/zenodo.15192144)
- ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg) 
+<p align="center">
+  <img src="images/logo_parole.png" alt="PAROLE logo" width="50%">
+</p>
+
+<h1 align="center" style="display: none;">PAROLE</h1>
+<h3 align="center" style="display: none;">Extracción automática de prosodia del habla</h3>
+
+
+<p align="center">
+  <a href="https://doi.org/10.5281/zenodo.15192144">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.15192144.svg" alt="DOI">
+  </a>
+  <img src="https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg" alt="Test PAROLE pipeline">
+</p>
+
 
 ## 🛠️ Descripción
 
@@ -16,6 +29,8 @@
 │   └── videos
 │       ├── video_ejemplo1.mp4
 │       └── video_ejemplo2.mp4
+├── images 
+│   └── logo_parole.png
 ├── install_parole.sh
 ├── requirements_python.txt
 ├── resultados
@@ -95,7 +110,7 @@ Para más detalles, consulta el archivo [`main.yml`](.github/workflows/main.yml)
 
 ## 💬 Contactos
 
-- **Soporte técnico:** [[Brian Herreño Jiménez](mailto:brian.herreno@um.es)
+- **Soporte técnico:** [Brian Herreño Jiménez](mailto:brian.herreno@um.es)
 - **Información del proyecto MULTIFLOW:** [Cristóbal Pagán Cánovas](mailto:cpcanovas@um.es)
 
 ---
@@ -116,8 +131,7 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 
 [➡️ Versión en Español](#parole-extracción-automática-de-prosodia-del-habla)
 
-# 📌 PAROLE: Automatic Speech Prosody Extraction [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15192144.svg)](https://doi.org/10.5281/zenodo.15192144)
- ![Test PAROLE pipeline](https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg)
+# 📌 PAROLE: Automatic Speech Prosody Extraction
 
 ## 🛠️ Description
 
@@ -130,14 +144,16 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 ```
 ├── data
 │   └── videos
-│       ├── example_video1.mp4
-│       └── example_video2.mp4
+│       ├── video_ejemplo1.mp4
+│       └── video_ejemplo2.mp4
+├── images
+│   └── logo_parole.png
 ├── install_parole.sh
 ├── requirements_python.txt
 ├── resultados
-│   └── example_video1
-│       ├── example_video1_prosody.csv
-│       └── example_video1_prosody.parquet
+│   └── video_ejemplo1
+│       ├── video_ejemplo1_prosody.csv
+│       └── video_ejemplo1_prosody.parquet
 └── scripts
     ├── extract_prosody.praat
     ├── parole_batch.sh
