@@ -4,9 +4,8 @@
   <img src="images/logo_parole.png" alt="PAROLE logo" width="50%">
 </p>
 
-<h1 align="center" style="display: none;">PAROLE</h1>
-<h3 align="center" style="display: none;">Extracción automática de prosodia del habla</h3>
-
+<h1 align="center" style="border: none; margin-bottom: 0;">PAROLE</h1>
+<h3 align="center" style="margin-top: 0;">Extracción automática de prosodia del habla</h3>
 
 <p align="center">
   <a href="https://doi.org/10.5281/zenodo.15192144">
