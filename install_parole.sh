@@ -52,30 +52,55 @@ if [[ ! $(command -v praat) ]]; then
       fi
     fi
 
-    if [ ! -f env/praat/praat ]; then
-      read -p "¿Deseas descargar Praat (versión barren) localmente en env/praat? [y/N]: " install_praat
-      if [[ "$install_praat" == "y" || "$install_praat" == "Y" ]]; then
-        echo "🌐 Descargando Praat barren edition..."
-        echo "(Si falla, quizás necesites 'libasound2-dev' y 'libgtk2.0-dev')"
-        PRAAT_URL="https://www.fon.hum.uva.nl/praat/praat6427_linux-intel64-barren.tar.gz"
-        mkdir -p env/praat
-        echo "🔽 Descargando desde $PRAAT_URL..."
-        curl -L "$PRAAT_URL" -o env/praat/praat_barren.tar.gz
+if [ ! -f env/praat/praat ]; then
+  read -p "¿Deseas descargar Praat (versión barren) localmente en env/praat? [y/N]: " install_praat
+  if [[ "$install_praat" == "y" || "$install_praat" == "Y" ]]; then
+    echo "🧠 Detectando arquitectura de la CPU..."
+    ARCH=$(uname -m)
 
-        echo "📦 Extrayendo..."
-        tar -xzf env/praat/praat_barren.tar.gz -C env/praat
-        rm env/praat/praat_barren.tar.gz
+    if [[ "$ARCH" == "x86_64" ]]; then
+      ARCH_SUFFIX="linux-intel64"
+    elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
+      ARCH_SUFFIX="linux-arm64"
+    else
+      echo "❌ Arquitectura no soportada automáticamente: $ARCH"
+      exit 1
+    fi
 
-        # Detectar binario descargado (puede ser 'praat_barren' o similar)
-        BIN_CANDIDATE=$(find env/praat -maxdepth 1 -type f -executable -name "praat*" | head -n 1)
+    echo "🌐 Descargando Praat barren edition para $ARCH_SUFFIX..."
+    echo "(Si falla, quizás necesites 'libasound2-dev' y 'libgtk2.0-dev')"
 
-        if [ -n "$BIN_CANDIDATE" ]; then
-          chmod +x "$BIN_CANDIDATE"
-          ln -sf "$(basename "$BIN_CANDIDATE")" env/praat/praat
-          echo "✅ Binario detectado y enlazado como env/praat/praat → $(basename "$BIN_CANDIDATE")"
-        else
-          echo "⚠️ No se encontró binario válido en la descarga. Revisa manualmente env/praat/"
-        fi
+    PRAAT_URL=$(curl -s https://www.fon.hum.uva.nl/praat/ | \
+      grep -oP "praat[0-9]+_${ARCH_SUFFIX}-barren\.tar\.gz" | \
+      sort -V | tail -n 1 | \
+      awk -v prefix="https://www.fon.hum.uva.nl/praat/" '{print prefix $1}')
+
+    if [ -z "$PRAAT_URL" ]; then
+      echo "❌ No se pudo encontrar una versión reciente de Praat para $ARCH_SUFFIX"
+      exit 1
+    fi
+
+    mkdir -p env/praat
+    echo "🔽 Descargando desde $PRAAT_URL..."
+    curl -L "$PRAAT_URL" -o env/praat/praat_barren.tar.gz
+
+    echo "📦 Extrayendo..."
+    tar -xzf env/praat/praat_barren.tar.gz -C env/praat
+    rm env/praat/praat_barren.tar.gz
+
+    # Detectar binario descargado (puede ser 'praat_barren' o simplemente 'praat')
+    BIN_CANDIDATE=$(find env/praat -maxdepth 1 -type f -executable -name "praat*" | head -n 1)
+
+    if [ -n "$BIN_CANDIDATE" ]; then
+      chmod +x "$BIN_CANDIDATE"
+      ln -sf "$(basename "$BIN_CANDIDATE")" env/praat/praat
+      echo "✅ Binario detectado y enlazado como env/praat/praat → $(basename "$BIN_CANDIDATE")"
+    else
+      echo "⚠️ No se encontró binario válido en la descarga. Revisa manualmente env/praat/"
+    fi
+  fi
+fi
+
 
         echo ""
         echo "✅ Praat (barren) listo en env/praat/"
