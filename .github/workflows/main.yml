@@ -43,5 +43,4 @@ jobs:
 
       - name: ✅ Check output
         run: |
-          test -f resultados/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today/\
-2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today_prosody.parquet
+          test -f "resultados/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today_prosody.parquet"
