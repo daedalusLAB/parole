@@ -34,146 +34,91 @@ else
   missing_deps+=("praat")
 fi
 
-########################################
-# 1. Instalar Praat local (barren) si no existe
-########################################
+##############################################################################
+# 1. Instalar Praat local (auto) ― con búsqueda de la versión más reciente
+##############################################################################
 
 if [[ ! $(command -v praat) ]]; then
   if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     echo ""
-    echo "⚠️  'praat' no está instalado en el sistema (versión global)."
-    echo "   Puedes instalarlo manualmente con apt, o de forma local en env/praat."
+    echo "⚠️  'praat' no está instalado en el sistema."
+    echo "   Se instalará localmente en env/praat (versión barren)."
 
-    if [ -f env/praat/praat ]; then
-      read -p "Ya se detectó una instalación local en env/praat. ¿Deseas reinstalarla? [y/N]: " reinstall_praat
-      if [[ "$reinstall_praat" == "y" || "$reinstall_praat" == "Y" ]]; then
-        echo "🗑 Borrando instalación local de Praat..."
-        rm -rf env/praat
-      fi
-    fi
-
-if [ ! -f env/praat/praat ]; then
-  read -p "¿Deseas descargar Praat (versión barren) localmente en env/praat? [y/N]: " install_praat
-  if [[ "$install_praat" == "y" || "$install_praat" == "Y" ]]; then
-    echo "🧠 Detectando arquitectura de la CPU..."
+    # ─────────────────────────────────────────────────────────
+    # Detectar arquitectura
     ARCH=$(uname -m)
-
     if [[ "$ARCH" == "x86_64" ]]; then
       ARCH_SUFFIX="linux-intel64"
     elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
       ARCH_SUFFIX="linux-arm64"
     else
-      echo "❌ Arquitectura no soportada automáticamente: $ARCH"
+      echo "❌ Arquitectura no soportada: $ARCH"
       exit 1
     fi
 
-    echo "🌐 Descargando Praat barren edition para $ARCH_SUFFIX..."
-    echo "(Si falla, quizás necesites 'libasound2-dev' y 'libgtk2.0-dev')"
+    # ─────────────────────────────────────────────────────────
+    # Semilla de versión y búsqueda incremental
+    PRAAT_VERSION="6432"           # <–– se autovariará si hay una más alta
+    SEARCH_LIMIT=100               # buscará hasta 100 versiones por delante
+    LATEST_VERSION=""
 
-    PRAAT_URL=$(curl -s https://www.fon.hum.uva.nl/praat/ | \
-      grep -oP "praat[0-9]+_${ARCH_SUFFIX}-barren\.tar\.gz" | \
-      sort -V | tail -n 1 | \
-      awk -v prefix="https://www.fon.hum.uva.nl/praat/" '{print prefix $1}')
+    echo "🔍 Buscando la versión más reciente de Praat (${ARCH_SUFFIX})…"
+    for ((i=0; i<=SEARCH_LIMIT; i++)); do
+      CANDIDATE=$((PRAAT_VERSION + i))
+      CANDIDATE_FILE="praat${CANDIDATE}_${ARCH_SUFFIX}-barren.tar.gz"
+      CANDIDATE_URL="https://www.fon.hum.uva.nl/praat/${CANDIDATE_FILE}"
 
-    if [ -z "$PRAAT_URL" ]; then
-      echo "❌ No se pudo encontrar una versión reciente de Praat para $ARCH_SUFFIX"
+      # ¿existe la URL?  (–--fail = devuelve 22 si 404)
+      if curl --head --silent --fail "$CANDIDATE_URL" > /dev/null; then
+        LATEST_VERSION=$CANDIDATE
+        PRAAT_FILE=$CANDIDATE_FILE
+        PRAAT_URL=$CANDIDATE_URL
+        break
+      fi
+    done
+
+    if [[ -z "$LATEST_VERSION" ]]; then
+      echo "❌ No se encontró ninguna versión válida tras $SEARCH_LIMIT intentos."
       exit 1
     fi
 
+    echo "✅ Encontrada versión $LATEST_VERSION  →  $PRAAT_FILE"
     mkdir -p env/praat
-    echo "🔽 Descargando desde $PRAAT_URL..."
-    curl -L "$PRAAT_URL" -o env/praat/praat_barren.tar.gz
+    echo "🔽 Descargando..."
+    curl -L "$PRAAT_URL" -o env/praat/praat.tar.gz
 
     echo "📦 Extrayendo..."
-    tar -xzf env/praat/praat_barren.tar.gz -C env/praat
-    rm env/praat/praat_barren.tar.gz
+    tar -xzf env/praat/praat.tar.gz -C env/praat
+    rm env/praat/praat.tar.gz
 
-    # Detectar binario descargado (puede ser 'praat_barren' o simplemente 'praat')
+    # ─────────────────────────────────────────────────────────
+    # Detectar binario y crear symlink estable
     BIN_CANDIDATE=$(find env/praat -maxdepth 1 -type f -executable -name "praat*" | head -n 1)
-
-    if [ -n "$BIN_CANDIDATE" ]; then
+    if [[ -n "$BIN_CANDIDATE" ]]; then
       chmod +x "$BIN_CANDIDATE"
       ln -sf "$(basename "$BIN_CANDIDATE")" env/praat/praat
-      echo "✅ Binario detectado y enlazado como env/praat/praat → $(basename "$BIN_CANDIDATE")"
+      echo "✅ Binario enlazado como env/praat/praat → $(basename "$BIN_CANDIDATE")"
     else
-      echo "⚠️ No se encontró binario válido en la descarga. Revisa manualmente env/praat/"
+      echo "⚠️  No se encontró binario válido tras la extracción."
     fi
-  fi
-fi
 
-
-        echo ""
-        echo "✅ Praat (barren) listo en env/praat/"
-        echo "ℹ️ Se añadirá automáticamente al PATH desde ./scripts/parole.sh"
-      else
-        echo "ℹ️ Puedes descargar Praat manualmente desde: https://www.fon.hum.uva.nl/praat/download_linux.html"
-        echo "   Asegúrate de poder usar 'praat' desde la terminal."
-      fi
+    # ─────────────────────────────────────────────────────────
+    # Autopersistencia de la versión (solo si cambió)
+    if [[ "$LATEST_VERSION" != "$PRAAT_VERSION" ]]; then
+      echo "📝 Actualizando versión por defecto en el propio script a $LATEST_VERSION…"
+      # $0 es la ruta del script en ejecución
+      sed -i -E "s/^PRAAT_VERSION=\"[0-9]+\"/PRAAT_VERSION=\"${LATEST_VERSION}\"/" "$0" || \
+        echo "⚠️  No se pudo reescribir la versión en $0 (permiso denegado)."
     fi
+
+    echo "🎉 Praat $LATEST_VERSION instalado en env/praat/"
   else
-    echo "❌ 'praat' no encontrado y no se puede instalar automáticamente en este sistema."
-    echo "   Descárgalo manualmente desde: https://www.fon.hum.uva.nl/praat/download_linux.html"
-  fi
-fi
-
-########################################
-# 2. Confirmar si continuar si hay dependencias faltantes
-########################################
-if [ ${#missing_deps[@]} -gt 0 ]; then
-  echo ""
-  echo "⚠️ Faltan las siguientes dependencias del sistema:"
-  printf '   - %s\n' "${missing_deps[@]}"
-  echo ""
-  read -p "¿Quieres continuar con la instalación de entorno Python y R de todas formas? [y/N]: " cont
-  if [[ "$cont" != "y" && "$cont" != "Y" ]]; then
-    echo "🛑 Instalación cancelada."
-    exit 1
-  fi
-fi
-
-echo ""
-echo "✅ Continuando con la instalación de entornos virtuales..."
-echo ""
-
-########################################
-# 3. Reinstalar / Crear entorno Python
-########################################
-REINSTALL_PY=false
-if [ -d env/pyenv ]; then
-  echo "⚠️ Se ha detectado un entorno Python existente en 'env/pyenv'."
-  read -p "¿Deseas reinstalar (borrar y crear de nuevo) el entorno de Python? [y/N]: " ans_py
-  if [[ "$ans_py" == "y" || "$ans_py" == "Y" ]]; then
-    REINSTALL_PY=true
-    echo "🗑 Borrando entorno Python existente..."
-    rm -rf env/pyenv
-  fi
-fi
-
-if [ ! -f requirements_python.txt ]; then
-  echo "❌ No se encontró 'requirements_python.txt'"
-  read -p "¿Quieres continuar sin instalar dependencias de Python? [y/N]: " py_skip
-  if [[ "$py_skip" != "y" && "$py_skip" != "Y" ]]; then
-    echo "🛑 Instalación cancelada."
-    exit 1
+    echo "ℹ️  Sistema no Linux-GNU: instala Praat manualmente."
   fi
 else
-  # Si REINSTALL_PY = true o no existía env/pyenv
-  if [ "$REINSTALL_PY" = true ] || [ ! -d env/pyenv ]; then
-    echo "🔧 Creando entorno virtual de Python en env/pyenv..."
-    python3 -m venv env/pyenv
-    source env/pyenv/bin/activate
-    pip install --upgrade pip
-
-    echo "📦 Instalando dependencias desde requirements_python.txt..."
-    pip install -r requirements_python.txt
-
-    deactivate
-    echo "✅ Entorno Python creado e instalado correctamente."
-  else
-    echo "✅ Manteniendo el entorno Python existente en env/pyenv"
-    echo "   (Si quieres reinstalarlo, vuelve a lanzar este script y elige 'y')"
-  fi
+  echo "✔  'praat' ya está disponible en el sistema; se omite instalación."
 fi
+
 
 ########################################
 # 4. Reinstalar / Crear entorno R
