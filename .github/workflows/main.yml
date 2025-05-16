@@ -37,14 +37,9 @@ jobs:
             make \
             g++
 
-      - name: 🧱 Download Praat (barren edition)
+      - name: 📦 Install PAROLE environment
         run: |
-          mkdir -p env/praat
-          curl -L https://www.fon.hum.uva.nl/praat/praat6427_linux-intel64-barren.tar.gz -o env/praat/praat.tar.gz
-          tar -xzf env/praat/praat.tar.gz -C env/praat
-          rm env/praat/praat.tar.gz
-          chmod +x env/praat/*
-          sudo ln -s "$PWD/env/praat/praat_barren" /usr/local/bin/praat
+          bash install_parole.sh <<< $'\n'
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
