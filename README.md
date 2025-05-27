@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://doi.org/10.5281/zenodo.15192144">
-    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.15192144.svg" alt="DOI">
+<a href="https://doi.org/10.5281/zenodo.15522925">
+  <img src="https://zenodo.org/badge/964120256.svg" alt="DOI">
   </a>
   <img src="https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg" alt="Test PAROLE pipeline">
 </p>
