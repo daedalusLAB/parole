@@ -23,6 +23,16 @@
 
 ---
 
+
+## 📘 Manual técnico
+
+Puedes consultar el manual completo de PAROLE en el siguiente enlace:
+
+📄 [Manual técnico (PDF, español)](./_book/Parole--Ecosistema-Funcional.pdf)
+
+Este documento incluye fundamentos teóricos, justificación metodológica, y detalles técnicos sobre la arquitectura, herramientas, scripts y formatos de salida.
+
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -139,6 +149,9 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 **PAROLE** is an automated pipeline for extracting speech prosodic information (pitch, intensity, formants, harmonicity, and Voice Activity Detection via VAD) from videos. It leverages standard tools like Praat, Python, R, and Silero-VAD, providing results in CSV or Parquet formats.
 
 ---
+
+📘 A technical manual (in Spanish) is available here: [Parole--Ecosistema-Funcional.pdf](./_book/Parole--Ecosistema-Funcional.pdf)
+
 
 ## 📁 Project Structure
 
