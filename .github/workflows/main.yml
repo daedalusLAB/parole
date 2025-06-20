@@ -2,35 +2,61 @@ name: Test PAROLE pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test-parole:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11']
 
     steps:
-      - name: 🔄 Checkout
-        uses: actions/checkout@v3
+      - name: 🔄 Checkout repository
+        uses: actions/checkout@v4
 
-      - name: 🧰 System deps (ffmpeg + headers)
+      - name: 🧰 Install system dependencies (ffmpeg + headers)
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
             ffmpeg \
             libasound2-dev \
             libgtk2.0-dev \
             r-base \
             curl \
-            build-essential  # (cmake, make, g++)
+            build-essential \
+            libarrow-dev
 
-      - name: 🐍 Set up Python 3.10
-        uses: actions/setup-python@v4
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
-      - name: 📦 Install PAROLE (no prompts)
+      - name: 📦 Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: 🦜 Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: 📦 Install R package 'arrow'
+        run: |
+          Rscript -e "install.packages('arrow', repos='https://cloud.r-project.org')"
+
+      - name: ⚙️ Install PAROLE (no prompts)
         run: |
           yes y | bash install_parole.sh
 
@@ -41,6 +67,17 @@ jobs:
             data/videos/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today.mp4 \
             resultados/ --parquet
 
-      - name: ✅ Check output
+      - name: ✅ Verify output file exists
         run: |
           test -f "resultados/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today/2016-01-01_0000_US_KNBC_The_Ellen_DeGeneres_Show_91.07-95.45_today_prosody.parquet"
+
+      - name: 📤 Upload resultados directory as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: parole-output-${{ matrix.python-version }}
+          path: resultados/
+          if-no-files-found: error
+
+      - name: 🚦 Add job summary
+        run: |
+          echo "✅ PAROLE pipeline completed successfully on Python ${{ matrix.python-version }}." >> $GITHUB_STEP_SUMMARY
