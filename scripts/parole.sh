@@ -155,22 +155,17 @@ fi
 ) &
 
 (
-  # PASO 5: TIMESTAMPS (ffprobe)
+	  # PASO 5: TIMESTAMPS (ffprobe)
   echo "[Paso 5] Extrayendo timestamps con ffprobe → $FRAMESCSV"
-  ffprobe -select_streams v:0 -show_frames \
-    -show_entries frame=pkt_pts_time -of csv=p=0 "$VIDEO" > "$FRAMESCSV"
-  
+  ffprobe -v error -select_streams v:0 -show_entries frame=pkt_pts_time \
+    -of csv=p=0 "$VIDEO" |
+  awk 'BEGIN{print "frame_id,frame_timestamp"} {printf "%d,%.6f\n", NR-1, $1}' > "$FRAMESCSV"
+
   if [ ! -s "$FRAMESCSV" ]; then
     echo "❌ Error: no se generó $FRAMESCSV"
     exit 1
   fi
-
-  # Añadir encabezado con frame_id y reescribir
-  awk 'BEGIN{print "frame_id,frame_timestamp"} {print NR-1","$1}' "$FRAMESCSV" \
-    > "${FRAMESCSV}.tmp"
-  mv "${FRAMESCSV}.tmp" "$FRAMESCSV"
 ) &
-
 # Esperar a que terminen PASO 3, 4 y 5
 wait
 

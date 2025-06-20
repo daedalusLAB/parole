@@ -16,6 +16,7 @@
   <img src="https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg" alt="Test PAROLE pipeline">
 </p>
 
+> **Consulta** [CHANGELOG.md](./CHANGELOG.md) **para ver los cambios recientes.**
 
 ## 🛠️ Descripción
 
@@ -143,6 +144,8 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 [➡️ Versión en Español](#parole-extracción-automática-de-prosodia-del-habla)
 
 # 📌 PAROLE: Automatic Speech Prosody Extraction
+
+> **See** [CHANGELOG.md](./CHANGELOG.md) **for the latest fixes.**  
 
 ## 🛠️ Description
 

@@ -119,6 +119,64 @@ else
   echo "✔  'praat' ya está disponible en el sistema; se omite instalación."
 fi
 
+########################################
+# 2. Confirmar si continuar si hay dependencias faltantes
+########################################
+if [ ${#missing_deps[@]} -gt 0 ]; then
+  echo ""
+  echo "⚠️ Faltan las siguientes dependencias del sistema:"
+  printf '   - %s\n' "${missing_deps[@]}"
+  echo ""
+  read -p "¿Quieres continuar con la instalación de entorno Python y R de todas formas? [y/N]: " cont
+  if [[ "$cont" != "y" && "$cont" != "Y" ]]; then
+    echo "🛑 Instalación cancelada."
+    exit 1
+  fi
+fi
+
+echo ""
+echo "✅ Continuando con la instalación de entornos virtuales..."
+echo ""
+
+########################################
+# 3. Reinstalar / Crear entorno Python
+########################################
+REINSTALL_PY=false
+if [ -d env/pyenv ]; then
+  echo "⚠️ Se ha detectado un entorno Python existente en 'env/pyenv'."
+  read -p "¿Deseas reinstalar (borrar y crear de nuevo) el entorno de Python? [y/N]: " ans_py
+  if [[ "$ans_py" == "y" || "$ans_py" == "Y" ]]; then
+    REINSTALL_PY=true
+    echo "🗑 Borrando entorno Python existente..."
+    rm -rf env/pyenv
+  fi
+fi
+
+if [ ! -f requirements_python.txt ]; then
+  echo "❌ No se encontró 'requirements_python.txt'"
+  read -p "¿Quieres continuar sin instalar dependencias de Python? [y/N]: " py_skip
+  if [[ "$py_skip" != "y" && "$py_skip" != "Y" ]]; then
+    echo "🛑 Instalación cancelada."
+    exit 1
+  fi
+else
+  # Si REINSTALL_PY = true o no existía env/pyenv
+  if [ "$REINSTALL_PY" = true ] || [ ! -d env/pyenv ]; then
+    echo "🔧 Creando entorno virtual de Python en env/pyenv..."
+    python3 -m venv env/pyenv
+    source env/pyenv/bin/activate
+    pip install --upgrade pip
+
+    echo "📦 Instalando dependencias desde requirements_python.txt..."
+    pip install -r requirements_python.txt
+
+    deactivate
+    echo "✅ Entorno Python creado e instalado correctamente."
+  else
+    echo "✅ Manteniendo el entorno Python existente en env/pyenv"
+    echo "   (Si quieres reinstalarlo, vuelve a lanzar este script y elige 'y')"
+  fi
+fi
 
 ########################################
 # 4. Reinstalar / Crear entorno R
