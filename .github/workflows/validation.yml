@@ -44,11 +44,19 @@ jobs:
             build-essential \
             libarrow-dev
 
+      - name: 🔄 Checkout
+  uses: actions/checkout@v4
+
       - name: 🐍 Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+      
+      - name: 📦 Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: 📦 Install Python dependencies
         run: |
