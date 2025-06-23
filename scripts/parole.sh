@@ -157,7 +157,7 @@ fi
 (
 	  # PASO 5: TIMESTAMPS (ffprobe)
   echo "[Paso 5] Extrayendo timestamps con ffprobe → $FRAMESCSV"
-  ffprobe -v error -select_streams v:0 -show_entries frame=pkt_pts_time \
+  ffprobe -v error -select_streams v:0 -show_entries frame=pts_time \
     -of csv=p=0 "$VIDEO" |
   awk 'BEGIN{print "frame_id,frame_timestamp"} {printf "%d,%.6f\n", NR-1, $1}' > "$FRAMESCSV"
 
