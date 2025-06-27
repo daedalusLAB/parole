@@ -58,7 +58,7 @@ if [[ ! $(command -v praat) ]]; then
 
     # ─────────────────────────────────────────────────────────
     # Semilla de versión y búsqueda incremental
-    PRAAT_VERSION="6432"           # <–– se autovariará si hay una más alta
+    PRAAT_VERSION="6436"           # <–– se autovariará si hay una más alta
     SEARCH_LIMIT=100               # buscará hasta 100 versiones por delante
     LATEST_VERSION=""
 

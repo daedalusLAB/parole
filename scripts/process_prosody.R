@@ -274,8 +274,6 @@ if (length(timestamps_csv) == 0) {
 timestamps_csv <- timestamps_csv[1]
 
 df_timestamps <- read.csv(timestamps_csv)
-df_timestamps <- df_timestamps[-1, ]
-df_timestamps$frame_timestamp[1] <- 0
 row.names(df_timestamps) <- NULL
 
 # Llamar a la función que parsea TODO en paralelo, un núcleo por tarea

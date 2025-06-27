@@ -1,15 +1,15 @@
-# 📜 CHANGELOG / HISTORIAL DE CAMBIOS
-
-All notable changes to **PAROLE** are documented in this file.
-
----
-
 ## 1.1.1  ·  2025-06-20
+
+### Fixed / Corregido · 2025-06-27
+
+| EN                                                                                                                                                                                                    | ES                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Frame 0 preserved in prosody pipeline** – Removed hard-coded deletion of the first row from `*_frame_timestamps.csv` in `process_prosody.R`. With FFmpeg 7.1+, this workaround is no longer needed. | **Preservación del frame 0 en la tubería prosódica** – Se eliminó el borrado forzado de la primera fila de `*_frame_timestamps.csv` en `process_prosody.R`. Con FFmpeg 7.1+, esta solución ya no es necesaria. |
 
 ### Fixed / Corregido · 2025-06-23
 
-| EN                                                                                                                                                                                                                                   | ES                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| EN                                                                                                                                                                                                                                        | ES                                                                                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Timestamp field migrated to `pts_time`** – The `ffprobe` call in `parole.sh` now uses `pts_time` instead of `pkt_pts_time` to restore stability under FFmpeg 7.1+, ensuring compatibility across formats and preventing silent failure. | **Campo de marca de tiempo migrado a `pts_time`** – La llamada a `ffprobe` en `parole.sh` ahora utiliza `pts_time` en lugar de `pkt_pts_time` para recuperar estabilidad en FFmpeg 7.1+, garantizando compatibilidad entre formatos y evitando fallos silenciosos. |
 
 ### Fixed / Corregido · 2025-06-20
@@ -21,6 +21,6 @@ All notable changes to **PAROLE** are documented in this file.
 
 ---
 
-Previous versions are tracked in the project’s Git history.  
+Previous versions are tracked in the project’s Git history.
 Las versiones anteriores se encuentran en el historial Git del proyecto.
 

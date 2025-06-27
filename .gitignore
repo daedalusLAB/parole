@@ -22,3 +22,5 @@ __pycache__/
 # Ignorar los workflows de GitHub Actions
 .github/workflows/
 
+
+/.quarto/

@@ -22,6 +22,9 @@ if [ "$3" == "--parquet" ]; then
   FORMAT_FLAG="--parquet"
 fi
 
+# Ruta absoluta al directorio donde está este script (para encontrar parole.sh)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # Crear carpeta de salida si no existe
 mkdir -p "$OUTDIR"
 
@@ -43,7 +46,7 @@ for VIDEO in "${VIDEO_FILES[@]}"; do
   BASENAME=$(basename "$VIDEO")
   echo "[$COUNT/$TOTAL] ▶ Procesando: $BASENAME"
 
-  ./scripts/parole.sh "$VIDEO" "$OUTDIR" $FORMAT_FLAG
+  "$SCRIPT_DIR/parole.sh" "$VIDEO" "$OUTDIR" $FORMAT_FLAG
 
   if [ $? -ne 0 ]; then
     echo "   ❌ Error procesando $BASENAME"
