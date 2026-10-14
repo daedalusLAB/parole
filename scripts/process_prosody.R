@@ -20,6 +20,17 @@ suppressWarnings(suppressMessages({
   library(parallel)
 }))
 
+# ---------------------------------------------------------------------
+# El aterrizaje de las pistas en la rejilla de fotogramas vive en su propio
+# fichero (prosody_align.R) para poder probarse sin ejecutar todo esto:
+# tools/test_prosody_interp.py levanta un directorio con ficheros de Praat
+# reales y comprueba que no se inventa ni un valor.
+# ---------------------------------------------------------------------
+args_no_trailing <- commandArgs(trailingOnly = FALSE)
+ESTE_SCRIPT <- sub("^--file=", "", grep("^--file=", args_no_trailing, value = TRUE)[1])
+ESTE_DIR <- if (is.na(ESTE_SCRIPT) || !nzchar(ESTE_SCRIPT)) "." else dirname(normalizePath(ESTE_SCRIPT))
+source(file.path(ESTE_DIR, "prosody_align.R"))
+
 #######################################################################
 # process_prosody.R
 #
@@ -292,15 +303,10 @@ df_silero <- if (length(silero_csv_path) == 1) {
   NULL
 }
 
-# Función de spline
-interpolate_spline <- function(time, values, new_times, method = "fmm") {
-  valid <- !is.na(values) & !is.na(time)
-  if (sum(valid) < 4) {
-    return(rep(NA, length(new_times)))
-  }
-  f_spline <- splinefun(time[valid], values[valid], method = method)
-  f_spline(new_times)
-}
+# El aterrizaje en la rejilla de fotogramas lo hace align_track(), que esta en
+# prosody_align.R junto con las constantes (MAX_GAP_S, MIN_TRACK_POINTS) y la razon de
+# ser de cada una. Aqui antes habia una spline cubica unica para toda la pista: ver el
+# comentario de cabecera de ese fichero.
 
 #######################################################################
 # 4. Interpolar en df_final
@@ -308,38 +314,40 @@ interpolate_spline <- function(time, values, new_times, method = "fmm") {
 frame_times <- df_timestamps$frame_timestamp
 df_final    <- df_timestamps
 
-# 4a. Pitch
+# 4a. Pitch. El silencio llega de Praat como candidato "mute" (nCandidates = 1 y
+# frequency = 0): es un hueco de la pista, no una frecuencia. Por eso se marca como NA
+# ANTES de alinear y desaparece el viejo `pitch[pitch < 10] <- 0`, que convertia
+# extrapolacion en un 0 indistinguible de una medida.
 if (!is.null(prosody_data$pitch)) {
-  df_final$pitch <- interpolate_spline(
-    prosody_data$pitch$time,
-    prosody_data$pitch$pitch,
-    frame_times
-  )
-  df_final$pitch[df_final$pitch < 10] <- 0
+  pitch_pista <- marcar_silencio_pitch(prosody_data$pitch$pitch)
+  df_final$pitch <- align_track(prosody_data$pitch$time, pitch_pista, frame_times)
 } else {
-  df_final$pitch <- NA
+  df_final$pitch <- NA_real_
 }
 
-# 4b. Intensity
+# 4b. Intensity: Praat la sigue midiendo en el silencio (es energia, no periodicidad),
+# asi que aqui casi nunca habra huecos; el cambio es que ya no se extrapola fuera de la
+# ventana analizada.
 if (!is.null(prosody_data$intensity)) {
-  df_final$intensity <- interpolate_spline(
+  df_final$intensity <- align_track(
     prosody_data$intensity$time,
     prosody_data$intensity$intensity,
     frame_times
   )
 } else {
-  df_final$intensity <- NA
+  df_final$intensity <- NA_real_
 }
 
-# 4c. Harmonicity
+# 4c. Harmonicity: el suelo del metodo (cc) de Praat es -200 dB; un valor por debajo de
+# ahi no lo pudo producir Praat. Con align_track eso es estructuralmente imposible.
 if (!is.null(prosody_data$harmonicity)) {
-  df_final$harmonicity <- interpolate_spline(
+  df_final$harmonicity <- align_track(
     prosody_data$harmonicity$time,
     prosody_data$harmonicity$harmonicity,
     frame_times
   )
 } else {
-  df_final$harmonicity <- NA
+  df_final$harmonicity <- NA_real_
 }
 
 # 4d. Formants F1..F5
@@ -347,13 +355,13 @@ if (!is.null(prosody_data$formant)) {
   for (i in seq_len(max_formants)) {
     freq_col <- paste0("formant.", i, "_frequency")
     if (freq_col %in% names(prosody_data$formant)) {
-      df_final[[freq_col]] <- interpolate_spline(
+      df_final[[freq_col]] <- align_track(
         prosody_data$formant$time,
         prosody_data$formant[[freq_col]],
         frame_times
       )
     } else {
-      df_final[[freq_col]] <- NA
+      df_final[[freq_col]] <- NA_real_
     }
   }
 }
@@ -366,6 +374,11 @@ if (!is.null(df_silero)) {
 } else {
   df_final$vad <- NA
 }
+
+# 4f. Procedencia de la voz: de que fotograma se puede afirmar que hay emision medida, no
+# interpolada. Es el companero de `right_n_speed` en la parte de voz: sin esta bandera,
+# NULL y "silencio" se confundian y cualquier media salia falseada.
+df_final$voice_present <- if (is.null(prosody_data$pitch)) NA else !is.na(df_final$pitch)
 
 #######################################################################
 # 5. Guardar en CSV o Parquet
