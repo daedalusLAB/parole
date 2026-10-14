@@ -45,44 +45,65 @@ if [[ ! $(command -v praat) ]]; then
     echo "   Se instalará localmente en env/praat (versión barren)."
 
     # ─────────────────────────────────────────────────────────
-    # Detectar arquitectura
+    # Detectar arquitectura. En Praat 7.x el asset de x86-64 cambió de nombre:
+    # `..._linux-intel64...` existe hasta 6.4.30 y a partir de 7.0 es
+    # `..._linux-x64v3...`. Se prueban los sufijos candidatos en orden en lugar de
+    # fijar uno, porque el instalador tiene que seguir sirviendo en equipos con 6.x.
     ARCH=$(uname -m)
     if [[ "$ARCH" == "x86_64" ]]; then
-      ARCH_SUFFIX="linux-intel64"
+      ARCH_SUFFIXES="x64v3|intel64"
     elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
-      ARCH_SUFFIX="linux-arm64"
+      ARCH_SUFFIXES="arm64"
     else
       echo "❌ Arquitectura no soportada: $ARCH"
       exit 1
     fi
 
     # ─────────────────────────────────────────────────────────
-    # Semilla de versión y búsqueda incremental
-    PRAAT_VERSION="6436"           # <–– se autovariará si hay una más alta
-    SEARCH_LIMIT=100               # buscará hasta 100 versiones por delante
-    LATEST_VERSION=""
-
-    echo "🔍 Buscando la versión más reciente de Praat (${ARCH_SUFFIX})…"
-    for ((i=0; i<=SEARCH_LIMIT; i++)); do
-      CANDIDATE=$((PRAAT_VERSION + i))
-      CANDIDATE_FILE="praat${CANDIDATE}_${ARCH_SUFFIX}-barren.tar.gz"
-      CANDIDATE_URL="https://www.fon.hum.uva.nl/praat/${CANDIDATE_FILE}"
-
-      # ¿existe la URL?  (–--fail = devuelve 22 si 404)
-      if curl --head --silent --fail "$CANDIDATE_URL" > /dev/null; then
-        LATEST_VERSION=$CANDIDATE
-        PRAAT_FILE=$CANDIDATE_FILE
-        PRAAT_URL=$CANDIDATE_URL
-        break
+    # Dónde está Praat. Los tarballs ya NO se sirven desde
+    # https://www.fon.hum.uva.nl/praat/ (devuelven 404 incluso para la versión que
+    # enlaza la propia página de descargas); ahora viven en las releases de GitHub:
+    # https://github.com/praat/praat/releases/download/v7.0.02/praat7002_linux-x64v3-barren.tar.gz
+    #
+    # Se pregunta a la API de la última release en vez de buscar versión a versión:
+    # el número `6436` no es monótono decodable (6.4.30 -> "6430", y 7.0.02 -> "7002"),
+    # así que la antigua semilla + `+1` no puede reconstruir la etiqueta `vX.Y.ZZ`, y
+    # de hecho la semilla quedó por encima del último 6.x (6.4.30), por lo que la
+    # búsqueda ascendente no podía acertar nunca.
+    #
+    # Para entornos sin salida a api.github.com se puede saltar la descobierta:
+    #   PRAAT_URL="https://github.com/praat/praat/releases/download/..." bash install_parole.sh
+    if [[ -z "${PRAAT_URL:-}" ]]; then
+      RELEASES_API="https://api.github.com/repos/praat/praat/releases/latest"
+      echo "🔍 Consultando la última release de Praat (${ARCH_SUFFIXES})…"
+      RELEASE_JSON=$(curl -sSL --max-time 30 -H "Accept: application/vnd.github+json" "$RELEASES_API" 2>/dev/null || true)
+      if [[ -z "$RELEASE_JSON" ]]; then
+        echo "❌ No se pudo consultar $RELEASES_API." >&2
+        echo "   (red, proxy, o límite de la API de GitHub sin token: 60 peticiones/h por IP)." >&2
+        echo '   Salida a mano: PRAAT_URL=<url del .tar.gz barren> bash '"$0" >&2
+        exit 1
       fi
-    done
-
-    if [[ -z "$LATEST_VERSION" ]]; then
-      echo "❌ No se encontró ninguna versión válida tras $SEARCH_LIMIT intentos."
-      exit 1
+      RELEASE_TAG=$(printf '%s\n' "$RELEASE_JSON" \
+        | grep -oE '"tag_name":[[:space:]]*"[^"]+"' | head -n 1 | sed -E 's/.*"([^"]+)"$/\1/' || true)
+      PRAAT_URL=$(printf '%s\n' "$RELEASE_JSON" \
+        | grep -oE '"browser_download_url":[[:space:]]*"[^"]+"' \
+        | sed -E 's/.*"(https[^"]+)"$/\1/' \
+        | grep -E "linux-(${ARCH_SUFFIXES})-barren\.tar\.gz$" | head -n 1 || true)
+      if [[ -z "$PRAAT_URL" ]]; then
+        echo "❌ La release ${RELEASE_TAG:-desconocida} no trae un asset barren para $ARCH (sufijos probados: ${ARCH_SUFFIXES//|/, })." >&2
+        echo "   Assets de Linux en esa release:" >&2
+        printf '%s\n' "$RELEASE_JSON" \
+          | grep -oE 'praat[0-9]+_linux[A-Za-z0-9._-]*\.tar\.gz' | sort -u | sed 's/^/     /' >&2
+        echo '   Salida a mano: PRAAT_URL=<url> bash '"$0" >&2
+        exit 1
+      fi
+    else
+      echo "🔍 Usando la PRAAT_URL indicada a mano…"
     fi
 
-    echo "✅ Encontrada versión $LATEST_VERSION  →  $PRAAT_FILE"
+    PRAAT_FILE=$(basename "$PRAAT_URL")
+    LATEST_VERSION=$(printf '%s' "$PRAAT_FILE" | sed -E 's/^praat([0-9]+)_.*/\1/')
+    echo "✅ Praat ${RELEASE_TAG:-$LATEST_VERSION}  →  $PRAAT_FILE"
     mkdir -p env/praat
     echo "🔽 Descargando..."
     curl -L "$PRAAT_URL" -o env/praat/praat.tar.gz
@@ -102,14 +123,11 @@ if [[ ! $(command -v praat) ]]; then
       echo "⚠️  No se encontró binario válido tras la extracción."
     fi
 
-    # ─────────────────────────────────────────────────────────
-    # Autopersistencia de la versión (solo si cambió)
-    if [[ "$LATEST_VERSION" != "$PRAAT_VERSION" ]]; then
-      echo "📝 Actualizando versión por defecto en el propio script a $LATEST_VERSION…"
-      # $0 es la ruta del script en ejecución
-      sed -i -E "s/^PRAAT_VERSION=\"[0-9]+\"/PRAAT_VERSION=\"${LATEST_VERSION}\"/" "$0" || \
-        echo "⚠️  No se pudo reescribir la versión en $0 (permiso denegado)."
-    fi
+    # (Antes este bloque reescribía su propia semilla PRAAT_VERSION con `sed -i $0`.
+    #  Se elimina a propósito: era la causa del fallo. La semilla se quedó congelada
+    #  en 6436 —por encima del último 6.x, 6.4.30— y al no poder reconstruir la
+    #  etiqueta de la release a partir del número, la búsqueda ascendente devolvía
+    #  100× 404. Descubrir la release en cada instalación es lo que falta.)
 
     echo "🎉 Praat $LATEST_VERSION instalado en env/praat/"
   else
