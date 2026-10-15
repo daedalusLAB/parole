@@ -1,5 +1,11 @@
 ## Sin publicar / Unreleased
 
+### Fixed / Corregido · 2026-10-15
+
+| EN | ES |
+| --- | --- |
+| **The validation workflow runs again** – `.github/workflows/validation.yml` did not parse: the `uses:` of the second checkout step was indented to 2 spaces instead of 8, and YAML fails the whole file with *mapping values are not allowed here* (line 50, column 13). A workflow that does not parse never starts, so none of its 14 steps had been executed. One-character-class fix; `yaml.safe_load` now accepts the file and reports the 14 steps in order. Two redundancies become visible once it parses and are left alone here: a second `actions/checkout@v4` (the job already checks out as its first step) and two steps named `📦 Install Python dependencies`. | **El workflow de validación vuelve a correr** – `.github/workflows/validation.yml` no parseaba: el `uses:` del segundo checkout estaba indentado con 2 espacios en lugar de 8, y YAML rechaza el fichero entero con *mapping values are not allowed here* (linea 50, columna 13). Un workflow que no parsea no llega a arrancar, asi que ninguno de sus 14 pasos se habia ejecutado nunca. Arreglo de una linea; `yaml.safe_load` ya acepta el fichero y devuelve los 14 pasos en orden. Al parsear salen dos redundancias que aqui se dejan como estan: un segundo `actions/checkout@v4` (el job ya se hace checkout como primer paso) y dos pasos llamados `📦 Install Python dependencies`. |
+
 ### Fixed / Corregido · 2026-10-14
 
 | EN | ES |
