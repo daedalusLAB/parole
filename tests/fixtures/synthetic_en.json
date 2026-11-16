@@ -1,0 +1,61 @@
+{
+  "source": "Mathematical tones and standard eSpeak NG en-us voice. No human recording or voice cloning.",
+  "text": "This is a synthetic voice for testing Parole. One, two, three.",
+  "voice": "en-us",
+  "speed": 145,
+  "pitch": 45,
+  "sample_rate": 16000,
+  "channels": 1,
+  "sample_width_bytes": 2,
+  "duration_s": 11.0979375,
+  "sha256": "d06270386d8de5cfccb9815932a06bbce5da436b31f7f3b957e1da3f3d9f95c4",
+  "timeline": [
+    {
+      "label": "Silence",
+      "start_s": 0.0,
+      "end_s": 0.6
+    },
+    {
+      "label": "220 Hz tone",
+      "start_s": 0.6,
+      "end_s": 1.4
+    },
+    {
+      "label": "Silence",
+      "start_s": 1.4,
+      "end_s": 1.7
+    },
+    {
+      "label": "440 Hz tone",
+      "start_s": 1.7,
+      "end_s": 2.5
+    },
+    {
+      "label": "Silence",
+      "start_s": 2.5,
+      "end_s": 2.8
+    },
+    {
+      "label": "Linear chirp 180-360 Hz",
+      "start_s": 2.8,
+      "end_s": 4.0
+    },
+    {
+      "label": "Silence",
+      "start_s": 4.0,
+      "end_s": 4.7
+    },
+    {
+      "label": "Synthetic English speech",
+      "start_s": 4.7,
+      "end_s": 10.0979375
+    },
+    {
+      "label": "Silence",
+      "start_s": 10.0979375,
+      "end_s": 11.0979375
+    }
+  ],
+  "espeak_version": "eSpeak NG text-to-speech: 1.51.1",
+  "ffmpeg_version": "ffmpeg version 7.1.5 Copyright (c) 2000-2026 the FFmpeg developers"
+}
