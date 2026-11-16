@@ -38,6 +38,7 @@ import sys
 import tempfile
 
 import pandas as pd
+import pytest
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RSCRIPT = os.path.join(REPO, "scripts", "process_prosody.R")
@@ -122,7 +123,7 @@ def escribir_entrada(dir_):
 
 
 def ejecutar(dir_):
-    env = dict(os.environ, R_LIBS_USER=os.path.join(REPO, "R_libs"))
+    env = dict(os.environ)
     r = subprocess.run(["Rscript", RSCRIPT, dir_, "clip_prosody.parquet"],
                        cwd=dir_, env=env, capture_output=True, text=True)
     if r.returncode != 0:
@@ -218,15 +219,23 @@ def case_intensity_no_se_null_ea_de_mas(df):
     return ok
 
 
-if __name__ == "__main__":
-    if not (os.path.isfile(RSCRIPT) and os.path.isfile(ALINEADOR)):
-        # Sin el codigo no hay nada que probar: esto no es un fallo. Con el codigo OLD (sin
-        # prosody_align.R) si que deberia saltar, que es para lo que existe este test.
-        print("[skip] no estan los scripts que prueba este test:")
-        print(f"       {RSCRIPT}")
-        print(f"       {ALINEADOR}")
-        print("\nTOTAL: 0/0")
-        sys.exit(0)
+CASES = [
+    case_silencio_largo_sin_pitch,
+    case_fuera_de_pista_todo_null,
+    case_nada_fuera_del_rango_de_su_pista,
+    case_cero_de_praat_no_es_un_valor,
+    case_agujero_corto_si_tiene_valor,
+    case_una_fila_por_fotograma,
+    case_voice_present_coherente,
+    case_intensity_no_se_null_ea_de_mas,
+]
+
+
+@pytest.fixture(scope="module")
+def prosody_output():
+    missing = [path for path in (RSCRIPT, ALINEADOR) if not os.path.isfile(path)]
+    if missing:
+        pytest.fail("Required prosody scripts are missing: " + ", ".join(missing))
     with tempfile.TemporaryDirectory() as tmp:
         n_frames = escribir_entrada(tmp)
         escribir_pitch(tmp)
@@ -235,21 +244,17 @@ if __name__ == "__main__":
         escribir_matriz(tmp, "harmonicity", ".Harmonicity", 0.014, HARM_FIN, 0.010,
                         lambda t: SUELO_HARM if SIL_INCIO <= t <= SIL_FIN else 15.0)
         escribir_formantes(tmp)
-        try:
-            df = ejecutar(tmp)
-        except Exception as e:  # noqa: BLE001
-            print(f"[FAIL] no se pudo ejecutar la cadena de prosodia: {e}")
-            print("\nTOTAL: 0/8")
-            sys.exit(1)
-        resultados = [
-            case_silencio_largo_sin_pitch(df),
-            case_fuera_de_pista_todo_null(df),
-            case_nada_fuera_del_rango_de_su_pista(df),
-            case_cero_de_praat_no_es_un_valor(df),
-            case_agujero_corto_si_tiene_valor(df),
-            case_una_fila_por_fotograma(df, n_frames),
-            case_voice_present_coherente(df),
-            case_intensity_no_se_null_ea_de_mas(df),
-        ]
-    print("\nTOTAL:", sum(resultados), "/", len(resultados))
-    sys.exit(0 if all(resultados) else 1)
+        yield ejecutar(tmp), n_frames
+
+
+@pytest.mark.parametrize("case", CASES, ids=lambda case: case.__name__)
+def test_prosody_interpolation(case, prosody_output):
+    df, n_frames = prosody_output
+    if case is case_una_fila_por_fotograma:
+        assert case(df, n_frames)
+    else:
+        assert case(df)
+
+
+if __name__ == "__main__":
+    sys.exit(pytest.main([__file__, "-q", *sys.argv[1:]]))

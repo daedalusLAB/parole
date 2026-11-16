@@ -1,3 +1,8 @@
+### Fixed / Corregido · 2026-11-16
+
+- **EN:** Run the eight existing synthetic prosody regression checks through pytest in a dedicated CI workflow. Missing processing scripts or runtime dependencies fail the check instead of producing a successful skip. Preserve the configured R package library so CI can find Arrow. Interpolation behavior is unchanged.
+- **ES:** Ejecuta las ocho comprobaciones sintéticas existentes de regresión prosódica con pytest en un workflow dedicado. La ausencia de scripts o dependencias produce un fallo en vez de una omisión exitosa. Respeta la biblioteca de paquetes R configurada para que CI encuentre Arrow. No cambia el comportamiento de la interpolación.
+
 ## Sin publicar / Unreleased
 
 ### Fixed / Corregido · 2026-10-15
