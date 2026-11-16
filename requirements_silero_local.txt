@@ -1,0 +1,5 @@
+# Local Silero VAD runtime dependencies (PyPI).
+# Install requirements_silero_cpu.txt first for CPU-only torch/torchaudio.
+pandas
+packaging
+soundfile

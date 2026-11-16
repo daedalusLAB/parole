@@ -1,0 +1,96 @@
+name: PAROLE CI
+
+on:
+  push:
+    branches: [main, "proposal/ci-and-provenance"]
+  pull_request:
+    branches: [main]
+
+# Keep only the latest run for each branch or pull request.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test-parole:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      # 1) Obtener el código
+      - name: 🔄 Checkout
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/data/
+            !/.Renviron
+            !/_book/
+
+      # 2) Dependencias de sistema (sin libarrow-dev)
+      - name: 🧰 System deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            ffmpeg libasound2-dev libgtk2.0-dev r-base curl \
+            build-essential cmake libssl-dev libcurl4-openssl-dev libxml2-dev
+
+      # 3) Python
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements_python.txt
+            requirements_silero_cpu.txt
+            requirements_silero_local.txt
+            requirements_test.txt
+
+      # 5) Instalar PAROLE (compila arrow en R dentro del script)
+      - name: ⚙️ Install PAROLE (no prompts)
+        run: |
+          PAROLE_PYTHON_REQUIREMENTS=requirements_silero_cpu.txt bash install_parole.sh <<< "y"
+
+      - name: Install CPU VAD and regression dependencies in PAROLE environment
+        run: |
+          env/pyenv/bin/python -m pip install -r requirements_silero_cpu.txt
+          env/pyenv/bin/python -m pip install -r requirements_silero_local.txt -r requirements_test.txt
+
+      - name: Verify upstream interpolation and provenance
+        run: R_LIBS_USER="$PWD/env/Rlibs" env/pyenv/bin/python -m pytest tests/ -v -s
+
+      - name: Verify synthetic input checksum
+        run: |
+          python - <<'PYCODE'
+          import hashlib, json
+          from pathlib import Path
+          p = Path("tests/fixtures/synthetic_en.wav")
+          expected = json.loads(p.with_suffix(".json").read_text())["sha256"]
+          assert hashlib.sha256(p.read_bytes()).hexdigest() == expected
+          PYCODE
+
+      - name: Run synthetic English example through PAROLE
+        run: |
+          mkdir -p resultados
+          ffmpeg -v error -f lavfi -i color=c=black:s=320x240:r=30 \
+            -i tests/fixtures/synthetic_en.wav -c:v mpeg4 -q:v 5 -pix_fmt yuv420p \
+            -c:a aac -b:a 128k -shortest resultados/synthetic_en.mp4
+          bash scripts/parole.sh resultados/synthetic_en.mp4 resultados --parquet
+
+      - name: Validate known tones, frame alignment and synthetic speech VAD
+        run: env/pyenv/bin/python tests/validate_synthetic_output.py
+
+      - name: Save synthetic results and provenance
+        uses: actions/upload-artifact@v6
+        with:
+          name: synthetic-parole-results
+          path: |
+            resultados/synthetic_en/synthetic_en_prosody.parquet
+            resultados/synthetic_validation.json
+            resultados/synthetic_en/synthetic_en_prosody.parquet.provenance.json
+          if-no-files-found: error

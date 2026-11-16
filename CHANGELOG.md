@@ -1,3 +1,11 @@
+### Fixed / Corregido · 2026-11-16
+
+- **EN:** Execute the eight existing synthetic interpolation checks with pytest; missing scripts or dependencies fail. Consolidate CI around full PAROLE processing of a traceable synthetic English fixture, CPU VAD, acoustic checks and provenance validation. Use Node 24 actions and a live README workflow badge. Preserve upstream interpolation.
+- **ES:** Ejecuta las ocho pruebas sintéticas existentes con pytest y falla si faltan scripts o dependencias. Unifica CI con procesamiento completo del ejemplo sintético trazable, VAD CPU, comprobaciones acústicas y procedencia. Usa Actions con Node 24 y un distintivo real en README. Conserva la interpolación de Daedalus.
+- **EN:** Pin and verify local Praat barren 6.4.60. Write a provenance JSON beside each CSV/Parquet with actual Praat version, Parole commit, timestamps and extraction commands read from the Praat script, plus completion status and checksums. Decode CPU VAD input with SoundFile.
+- **ES:** Fija y verifica Praat barren 6.4.60 local. Añade junto a cada CSV/Parquet un JSON con versión ejecutada, commit, fechas y comandos de extracción leídos del script Praat, estado de finalización y hashes. Lee la entrada de VAD CPU con SoundFile.
+- **EN / ES:** Present Brian Herreño Jiménez, Cristóbal Pagán Cánovas (MULTIFLOW) and Raúl Sánchez in the development team; use Brian's Gmail and Raúl's personal GitHub profile. Clarify historical ministerial support through December 2025 and continued collaboration with MULTIFLOW; copyright and license remain unchanged. / Presenta a los tres en el equipo de desarrollo, con el Gmail de Brian y el GitHub personal de Raúl. Aclara el apoyo ministerial inicial hasta diciembre de 2025 y la colaboración continuada con MULTIFLOW, sin modificar copyright ni licencia.
+
 ## Sin publicar / Unreleased
 
 ### Fixed / Corregido · 2026-10-15

@@ -13,7 +13,9 @@
 <a href="https://doi.org/10.5281/zenodo.15522925">
   <img src="https://zenodo.org/badge/964120256.svg" alt="DOI">
   </a>
-  <img src="https://github.com/daedalusLAB/parole/actions/workflows/main.yml/badge.svg" alt="Test PAROLE pipeline">
+  <a href="https://github.com/daedalusLAB/parole/actions/workflows/parole-ci.yml">
+    <img src="https://github.com/daedalusLAB/parole/actions/workflows/parole-ci.yml/badge.svg?branch=main" alt="PAROLE CI — live main status">
+  </a>
 </p>
 
 > **Consulta** [CHANGELOG.md](./CHANGELOG.md) **para ver los cambios recientes.**
@@ -116,14 +118,38 @@ Este repositorio cuenta con un test automático en GitHub Actions que verifica:
 - Ejecución del script `parole.sh` sobre un vídeo de prueba
 - Verificación del archivo de salida en `.parquet`
 
-Para más detalles, consulta el archivo [`main.yml`](.github/workflows/main.yml).
+Para más detalles, consulta el archivo [`parole-ci.yml`](.github/workflows/parole-ci.yml).
+
+---
+
+## 🔬 Reproducibilidad y validación
+
+El instalador fija y verifica **Praat barren 6.4.60**, obtenido de la [release histórica oficial](https://github.com/praat/praat.github.io/releases/tag/v6.4.60), y utiliza el binario local aunque exista otro Praat en el sistema. Cada CSV o Parquet se acompaña de un archivo `.provenance.json` con la versión ejecutada, el commit de Parole (o `null` si no hay Git), el estado de cambios locales, la fecha UTC y los parámetros leídos directamente de `scripts/extract_prosody.praat`. El JSON indica `running` durante el procesamiento y `complete` solo tras generar el resultado; incluye hashes del script y del resultado. No altera el esquema de datos ni el método de interpolación.
+
+### CI sintético
+
+CI instala PAROLE, ejecuta las pruebas de interpolación existentes y procesa el ejemplo sintético en inglés. Comprueba fotogramas, tonos conocidos, un barrido, VAD en CPU y el JSON de procedencia. Solo publica resultados sintéticos e informes JSON. El distintivo muestra el estado real del workflow de `main`. El [audio sintético](tests/fixtures/synthetic_en.wav) y su [manifiesto](tests/fixtures/synthetic_en.json) permiten reproducir el ejemplo. Esta prueba no mide la precisión sobre habla humana.
+
+VAD local opcional en CPU:
+
+```bash
+env/pyenv/bin/python -m pip install -r requirements_silero_cpu.txt
+env/pyenv/bin/python -m pip install -r requirements_silero_local.txt
+```
+
+CI selecciona las dependencias CPU al instalar mediante `PAROLE_PYTHON_REQUIREMENTS=requirements_silero_cpu.txt`; las instalaciones habituales conservan `requirements_python.txt`. Silero lee WAV normalizados con SoundFile. La primera descarga del modelo requiere internet; el modelo sigue la referencia `master` de Torch Hub y CI registra su hash.
+
+### Colaboración en investigación
+
+Brian Herreño Jiménez colabora en PAROLE y desarrolla su investigación en [bHerreno/parole](https://github.com/bHerreno/parole). Los cambios se proponen a este repositorio mediante pull requests para revisión y aprobación.
 
 ---
 
 ## 💬 Contactos
 
-- **Soporte técnico:** [Brian Herreño Jiménez](mailto:brian.herreno@um.es)
-- **Información del proyecto MULTIFLOW:** [Cristóbal Pagán Cánovas](mailto:cpcanovas@um.es)
+- **Brian Herreño Jiménez:** [@bHerreno](https://github.com/bHerreno) · [brian.herreno@gmail.com](mailto:brian.herreno@gmail.com)
+- **Cristóbal Pagán Cánovas — MULTIFLOW:** [cpcanovas@um.es](mailto:cpcanovas@um.es)
+- **Raúl Sánchez:** [@RaulKite](https://github.com/RaulKite)
 
 ---
 
@@ -135,7 +161,7 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 
 ## 📌 Autoría y financiación
 
-**PAROLE** es un artefacto desarrollado por Daedalus Lab bajo el proyecto MULTIFLOW, financiado por el Ministerio de Ciencia, Innovación y Universidades de España.
+**PAROLE** se desarrolla en Daedalus Lab en colaboración con MULTIFLOW. Su desarrollo inicial recibió apoyo ministerial hasta finales de diciembre de 2025. Su uso y redistribución se rigen por la licencia GPL-3.0.
 
 ---
 
@@ -237,14 +263,38 @@ This repository includes an automated test in GitHub Actions that checks:
 - Verification of the `.parquet` output file
 
 
-For more details, see the [`main.yml`](.github/workflows/main.yml) file.
+For more details, see the [`parole-ci.yml`](.github/workflows/parole-ci.yml) file.
+
+---
+
+## 🔬 Reproducibility and validation
+
+The installer pins and verifies **Praat barren 6.4.60** from the [official historical release](https://github.com/praat/praat.github.io/releases/tag/v6.4.60), using the local binary independently of system Praat. Each CSV or Parquet has a `.provenance.json` sidecar recording the actual Praat version, Parole commit (or `null` without Git), working-tree state, UTC timestamps and parameters read directly from `scripts/extract_prosody.praat`. Its status is `running` during processing and `complete` only after producing the result; it also records script and output hashes. The data schema and upstream interpolation method are unchanged.
+
+### Synthetic CI
+
+CI installs PAROLE, executes the existing interpolation regression tests, and processes the [synthetic English fixture](tests/fixtures/synthetic_en.wav). Its [manifest](tests/fixtures/synthetic_en.json) records the input checksum and timeline. Checks cover frame alignment, known tones, a chirp, CPU voice activity detection and the provenance sidecar. Only synthetic results and JSON reports are uploaded. This is a reproducible smoke test, not a human-speech accuracy benchmark. The badge above reports the actual status of the `main` workflow.
+
+Optional local CPU VAD:
+
+```bash
+env/pyenv/bin/python -m pip install -r requirements_silero_cpu.txt
+env/pyenv/bin/python -m pip install -r requirements_silero_local.txt
+```
+
+CI selects CPU dependencies during installation with `PAROLE_PYTHON_REQUIREMENTS=requirements_silero_cpu.txt`; ordinary installations retain `requirements_python.txt`. Silero reads normalized WAV using SoundFile. The first model download needs internet; the model still follows Torch Hub's `master` reference, and synthetic CI records the model checksum.
+
+### Research collaboration
+
+Brian Herreño Jiménez contributes to PAROLE and develops research work in [bHerreno/parole](https://github.com/bHerreno/parole). Changes are proposed to this repository through pull requests for review and approval.
 
 ---
 
 ## 💬 Contacts
 
-- **Technical support:** [Brian Herreño Jiménez](mailto:brian.herreno@um.es)
-- **MULTIFLOW project information:** [Cristóbal Pagán Cánovas](mailto:cpcanovas@um.es)
+- **Brian Herreño Jiménez:** [@bHerreno](https://github.com/bHerreno) · [brian.herreno@gmail.com](mailto:brian.herreno@gmail.com)
+- **Cristóbal Pagán Cánovas — MULTIFLOW:** [cpcanovas@um.es](mailto:cpcanovas@um.es)
+- **Raúl Sánchez:** [@RaulKite](https://github.com/RaulKite)
 
 ---
 
@@ -256,5 +306,4 @@ This project is distributed under the [GPL-3 License](https://www.gnu.org/licens
 
 ## 📌 Authorship and Funding
 
-**PAROLE** is an artifact developed by Daedalus Lab as part of the MULTIFLOW project, funded by the Ministry of Science, Innovation, and Universities of Spain.
-
+**PAROLE** is developed at Daedalus Lab in collaboration with MULTIFLOW. Its initial development received ministerial support until the end of December 2025. Use and redistribution are governed by GPL-3.0.

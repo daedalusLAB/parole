@@ -24,3 +24,9 @@ __pycache__/
 
 
 /.quarto/
+
+.Renviron
+.pytest_cache/
+!tests/fixtures/synthetic_en.wav
+
+/env

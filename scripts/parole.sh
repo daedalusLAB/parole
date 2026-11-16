@@ -86,6 +86,13 @@ FRAMESCSV="$(realpath --canonicalize-missing "$FRAMESCSV")"
 PRAAT_SCRIPT="${BASEDIR}/scripts/extract_prosody.praat"
 RSCRIPT="${BASEDIR}/scripts/process_prosody.R"
 SILERO_PY="${BASEDIR}/scripts/silero_vad_runner.py"
+PROVENANCE_PY="${BASEDIR}/scripts/write_provenance.py"
+PRAAT_BIN="$(command -v praat)"
+PYTHON_BIN="${BASEDIR}/env/pyenv/bin/python"
+if [ ! -x "$PYTHON_BIN" ]; then PYTHON_BIN="$(command -v python3)"; fi
+"$PYTHON_BIN" "$PROVENANCE_PY" start --repo "$BASEDIR" --praat "$PRAAT_BIN" \
+  --script "$PRAAT_SCRIPT" --output "${FINALDIR}/${OUTFILE_NAME}"
+
 
 # --------------------------------------------------------------------
 # --- 2. Extraer audio (secuencial) ---
@@ -131,6 +138,7 @@ fi
     echo "⚠️  $SILERO_PY no encontrado. Omitiendo VAD."
   fi
 ) &
+VAD_PID=$!
 
 (
   # PASO 4: PRAAT
@@ -151,8 +159,9 @@ fi
     exit 1
   fi
   
-  praat --run "$PRAAT_SCRIPT" "$AUDIOWAV" "$FINALDIR"
+  "$PRAAT_BIN" --run "$PRAAT_SCRIPT" "$AUDIOWAV" "$FINALDIR"
 ) &
+PRAAT_PID=$!
 
 (
 	  # PASO 5: TIMESTAMPS (ffprobe)
@@ -166,8 +175,11 @@ fi
     exit 1
   fi
 ) &
-# Esperar a que terminen PASO 3, 4 y 5
-wait
+FRAMES_PID=$!
+# VAD remains optional; Praat and timestamps are required.
+wait "$VAD_PID" || echo "⚠️ Silero failed; continuing without VAD."
+wait "$PRAAT_PID"
+wait "$FRAMES_PID"
 
 # --------------------------------------------------------------------
 # --- 6. Ejecutar Rscript (process_prosody.R) ---
@@ -184,6 +196,8 @@ if ! command -v Rscript &>/dev/null; then
 fi
 
 R_LIBS_USER="${BASEDIR}/env/Rlibs" Rscript "$RSCRIPT" "$FINALDIR" "$OUTFILE_NAME"
+"$PYTHON_BIN" "$PROVENANCE_PY" complete --repo "$BASEDIR" --praat "$PRAAT_BIN" \
+  --script "$PRAAT_SCRIPT" --output "${FINALDIR}/${OUTFILE_NAME}"
 echo "✅ Rscript completado. Archivo final generado: $OUTFILE_NAME"
 
 # --------------------------------------------------------------------
