@@ -122,10 +122,11 @@ Para más detalles, consulta el archivo [`parole-ci.yml`](.github/workflows/paro
 
 ---
 
-## 💬 Contactos
+## 💬 Equipo de desarrollo
 
-- **Soporte técnico:** [Brian Herreño Jiménez](mailto:brian.herreno@um.es)
-- **Información del proyecto MULTIFLOW:** [Cristóbal Pagán Cánovas](mailto:cpcanovas@um.es)
+- **Brian Herreño Jiménez:** [@bHerreno](https://github.com/bHerreno) · [brian.herreno@gmail.com](mailto:brian.herreno@gmail.com)
+- **Cristóbal Pagán Cánovas — MULTIFLOW:** [cpcanovas@um.es](mailto:cpcanovas@um.es)
+- **Raúl Sánchez:** [@RaulKite](https://github.com/RaulKite)
 
 ---
 
@@ -137,7 +138,7 @@ Este proyecto se distribuye bajo la licencia [GPL-3](https://www.gnu.org/license
 
 ## 📌 Autoría y financiación
 
-**PAROLE** es un artefacto desarrollado por Daedalus Lab bajo el proyecto MULTIFLOW, financiado por el Ministerio de Ciencia, Innovación y Universidades de España.
+**PAROLE** se desarrolla en Daedalus Lab en colaboración con MULTIFLOW. Su desarrollo inicial recibió apoyo ministerial hasta finales de diciembre de 2025. Su uso y redistribución se rigen por la licencia GPL-3.0.
 
 ---
 
@@ -243,10 +244,11 @@ For more details, see the [`parole-ci.yml`](.github/workflows/parole-ci.yml) fil
 
 ---
 
-## 💬 Contacts
+## 💬 Development team
 
-- **Technical support:** [Brian Herreño Jiménez](mailto:brian.herreno@um.es)
-- **MULTIFLOW project information:** [Cristóbal Pagán Cánovas](mailto:cpcanovas@um.es)
+- **Brian Herreño Jiménez:** [@bHerreno](https://github.com/bHerreno) · [brian.herreno@gmail.com](mailto:brian.herreno@gmail.com)
+- **Cristóbal Pagán Cánovas — MULTIFLOW:** [cpcanovas@um.es](mailto:cpcanovas@um.es)
+- **Raúl Sánchez:** [@RaulKite](https://github.com/RaulKite)
 
 ---
 
@@ -258,7 +260,7 @@ This project is distributed under the [GPL-3 License](https://www.gnu.org/licens
 
 ## 📌 Authorship and Funding
 
-**PAROLE** is an artifact developed by Daedalus Lab as part of the MULTIFLOW project, funded by the Ministry of Science, Innovation, and Universities of Spain.
+**PAROLE** is developed at Daedalus Lab in collaboration with MULTIFLOW. Its initial development received ministerial support until the end of December 2025. Use and redistribution are governed by GPL-3.0.
 
 
 ## Reproducibilidad y validación / Reproducibility and validation
@@ -282,10 +284,7 @@ env/pyenv/bin/python -m pip install -r requirements_silero_local.txt
 
 CI selects CPU dependencies during installation with `PAROLE_PYTHON_REQUIREMENTS=requirements_silero_cpu.txt`; ordinary installations retain `requirements_python.txt`. Silero reads normalized WAV using SoundFile. The first model download needs internet; the model still follows Torch Hub's `master` reference, and synthetic CI records the model checksum.
 
-## Contributors / Personas colaboradoras
-
-- [Brian Herreño Jiménez](https://github.com/bHerreno)
-- [Raúl Sánchez](https://github.com/raul-agent)
+## Research collaboration / Colaboración en investigación
 
 **Research development:** Brian Herreño Jiménez contributes to PAROLE and develops research work in [bHerreno/parole](https://github.com/bHerreno/parole). Changes are proposed to this repository through pull requests for review and approval.
 
